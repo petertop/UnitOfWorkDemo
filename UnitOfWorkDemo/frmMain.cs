@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using StructureMap;
 using UnitOfWorkDemo.Services;
 
 namespace UnitOfWorkDemo
@@ -22,7 +23,7 @@ namespace UnitOfWorkDemo
         {
             try
             {
-                IMessageService service = StructureMap.ObjectFactory.GetInstance<IMessageService>();
+                IMessageService service = ObjectFactory.GetInstance<IMessageService>();
 
                 MessageBox.Show(service.GetMessage());
             }
