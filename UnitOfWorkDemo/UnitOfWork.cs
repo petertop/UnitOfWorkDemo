@@ -1,40 +1,46 @@
-﻿using System;
+﻿using StructureMap;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnitOfWorkDemo.Data;
+using UnitOfWorkDemo.Data.Abstract;
 
 namespace UnitOfWorkDemo
 {
     public class UnitOfWork : IDisposable
     {
         // Fields
-        private IDataRepository _context = StructureMap.ObjectFactory.GetInstance<IDataRepository>();
+        private IPearsonRepository _repository;
 
-        DataRepository _pearsonRepository;
-        
+        private IPearsonRepository _nHibernatePearsonRepo = ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepo");
+
         private bool _disposed = false;
 
+        public UnitOfWork(EnumRepositoryType repo)
+        {
+            if (repo == EnumRepositoryType.InMemory)
+                _repository = ObjectFactory.GetNamedInstance<IPearsonRepository>("InMemoryRepo");
+            else if (repo == EnumRepositoryType.NHibernate)
+                _repository = ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepo");
+        }
+
+
         // Fields
-        public DataRepository PearsonRepository
+        public IPearsonRepository PearsonRepository
         {
             get
             {
-                if (this._pearsonRepository == null)
-                {
-                    this._pearsonRepository = (DataRepository)_context;
-                }
-                return _pearsonRepository;
+                return _repository;
             }
         }
-       
 
 
         // Save
         public void Save()
         {
-            _context.Save();
+            _repository.Save();
         }
 
 
@@ -46,7 +52,7 @@ namespace UnitOfWorkDemo
             {
                 if (disposing)
                 {
-                    //_context.Dispose();
+                    _repository.Dispose();
                 }
             }
             this._disposed = true;

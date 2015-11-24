@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NHibernate;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,6 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UnitOfWorkDemo.Data;
+using UnitOfWorkDemo.Data.Abstract;
+using UnitOfWorkDemo.Entities;
 using UnitOfWorkDemo.Services;
 
 namespace UnitOfWorkDemo
@@ -33,31 +37,78 @@ namespace UnitOfWorkDemo
 
         }
 
+
         private void cmdWorkWithRepository_Click(object sender, EventArgs e)
         {
-            using(UnitOfWork work = new UnitOfWork())
+            Dosomething(EnumRepositoryType.InMemory);
+            dgPearsons.DataSource = GetAll(EnumRepositoryType.InMemory);
+        }
+
+
+        private void cmdWorkWithHHibRepo_Click(object sender, EventArgs e)
+        {
+            Dosomething(EnumRepositoryType.NHibernate);
+            dgPearsons.DataSource = GetAll(EnumRepositoryType.NHibernate);
+        }
+
+
+        private void cmdHelloHib_Click(object sender, EventArgs e)
+        {
+            var sessionFactory = NHibernateFactory.CreateSessionFactory();
+
+            using (var session = sessionFactory.OpenSession())
             {
-                work.PearsonRepository.Create(new Entities.Pearson { Id = 1, FirstName = "Peter", LastName = "Topolšek" });
-                work.PearsonRepository.Create(new Entities.Pearson { Id = 2, FirstName = "Peter", LastName = "Topolšek" });
-                work.PearsonRepository.Create(new Entities.Pearson { Id = 3, FirstName = "Peter", LastName = "Topolšek" });
-                work.PearsonRepository.Update(new Entities.Pearson { Id = 2, FirstName = "Katarina", LastName = "Ročnik" });
-                work.PearsonRepository.Delete(3);
+                string h_stmt = "FROM Pearson";
 
-                work.Save();
+                IQuery query = session.CreateQuery(h_stmt);
 
-                MessageBox.Show(work.PearsonRepository.Get().Count().ToString());
+                IList<Pearson> pearsonList = query.List<Pearson>();
 
-                string data = string.Join(",", work.PearsonRepository.Get().Select(p=>p.FirstName).ToArray());
+                dgPearsons.DataSource = pearsonList;
 
-                MessageBox.Show(data);
+                lblStatistics.Text = "Total records returned: " + pearsonList.Count;
+
             }
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+
+        #region Methods
+
+        private void Dosomething(EnumRepositoryType repoType)
         {
-            // todo
-            MessageBox.Show("Hello");
+            using (UnitOfWork work = new UnitOfWork(repoType))
+            {
+                string data;
+
+                work.PearsonRepository.Create(new Entities.Pearson { Id = 1, FirstName = "Peter", LastName = "Topolšek" });
+                work.PearsonRepository.Create(new Entities.Pearson { Id = 2, FirstName = "Peter", LastName = "Topolšek" });
+                work.PearsonRepository.Create(new Entities.Pearson { Id = 3, FirstName = "Peter", LastName = "Topolšek" });
+                work.Save();
+
+                data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
+                MessageBox.Show("Before edit: \n" + data);
+
+
+                work.PearsonRepository.Update(new Entities.Pearson { Id = 2, FirstName = "Katarina", LastName = "Ročnik" });
+                work.PearsonRepository.Delete(3);
+                work.Save();
+
+                data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
+                MessageBox.Show("After edit: \n" + data);
+
+
+                MessageBox.Show("Final result: \n" + data + "\n Število vseh: " + work.PearsonRepository.Get().Count().ToString());
+            }
         }
+
+        private IEnumerable<Pearson> GetAll(EnumRepositoryType repoType)
+        {
+            using (UnitOfWork work = new UnitOfWork(repoType))
+            {
+                return work.PearsonRepository.Get();
+            }
+        }
+        #endregion
     }
 }

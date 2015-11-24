@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnitOfWorkDemo.Entities;
 
-namespace UnitOfWorkDemo.Data
+namespace UnitOfWorkDemo.Data.Abstract
 {
-    interface IDataRepository
+    public interface IPearsonRepository : IDisposable
     {
         bool Create(Pearson item);
         bool Update(Pearson item);

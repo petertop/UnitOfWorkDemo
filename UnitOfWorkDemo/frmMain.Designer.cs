@@ -30,12 +30,16 @@
         {
             this.button1 = new System.Windows.Forms.Button();
             this.cmdWorkWithRepository = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.cmdHelloHhib = new System.Windows.Forms.Button();
+            this.cmdWorkWithHHibRepo = new System.Windows.Forms.Button();
+            this.dgPearsons = new System.Windows.Forms.DataGridView();
+            this.lblStatistics = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.dgPearsons)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(83, 35);
+            this.button1.Location = new System.Drawing.Point(13, 37);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(102, 23);
             this.button1.TabIndex = 0;
@@ -45,7 +49,7 @@
             // 
             // cmdWorkWithRepository
             // 
-            this.cmdWorkWithRepository.Location = new System.Drawing.Point(64, 81);
+            this.cmdWorkWithRepository.Location = new System.Drawing.Point(13, 66);
             this.cmdWorkWithRepository.Name = "cmdWorkWithRepository";
             this.cmdWorkWithRepository.Size = new System.Drawing.Size(139, 23);
             this.cmdWorkWithRepository.TabIndex = 1;
@@ -53,27 +57,59 @@
             this.cmdWorkWithRepository.UseVisualStyleBackColor = true;
             this.cmdWorkWithRepository.Click += new System.EventHandler(this.cmdWorkWithRepository_Click);
             // 
-            // button2
+            // cmdHelloHhib
             // 
-            this.button2.Location = new System.Drawing.Point(83, 123);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(102, 23);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "Hello!";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.cmdHelloHhib.Location = new System.Drawing.Point(13, 95);
+            this.cmdHelloHhib.Name = "cmdHelloHhib";
+            this.cmdHelloHhib.Size = new System.Drawing.Size(102, 23);
+            this.cmdHelloHhib.TabIndex = 2;
+            this.cmdHelloHhib.Text = "Hello Hibernate!";
+            this.cmdHelloHhib.UseVisualStyleBackColor = true;
+            this.cmdHelloHhib.Click += new System.EventHandler(this.cmdHelloHib_Click);
+            // 
+            // cmdWorkWithHHibRepo
+            // 
+            this.cmdWorkWithHHibRepo.Location = new System.Drawing.Point(158, 66);
+            this.cmdWorkWithHHibRepo.Name = "cmdWorkWithHHibRepo";
+            this.cmdWorkWithHHibRepo.Size = new System.Drawing.Size(139, 23);
+            this.cmdWorkWithHHibRepo.TabIndex = 3;
+            this.cmdWorkWithHHibRepo.Text = "Work With NHib Repo";
+            this.cmdWorkWithHHibRepo.UseVisualStyleBackColor = true;
+            this.cmdWorkWithHHibRepo.Click += new System.EventHandler(this.cmdWorkWithHHibRepo_Click);
+            // 
+            // dgPearsons
+            // 
+            this.dgPearsons.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgPearsons.Location = new System.Drawing.Point(13, 124);
+            this.dgPearsons.Name = "dgPearsons";
+            this.dgPearsons.Size = new System.Drawing.Size(422, 183);
+            this.dgPearsons.TabIndex = 4;
+            // 
+            // lblStatistics
+            // 
+            this.lblStatistics.AutoSize = true;
+            this.lblStatistics.Location = new System.Drawing.Point(8, 9);
+            this.lblStatistics.Name = "lblStatistics";
+            this.lblStatistics.Size = new System.Drawing.Size(59, 13);
+            this.lblStatistics.TabIndex = 5;
+            this.lblStatistics.Text = "lblStatistics";
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 158);
-            this.Controls.Add(this.button2);
+            this.ClientSize = new System.Drawing.Size(447, 319);
+            this.Controls.Add(this.lblStatistics);
+            this.Controls.Add(this.dgPearsons);
+            this.Controls.Add(this.cmdWorkWithHHibRepo);
+            this.Controls.Add(this.cmdHelloHhib);
             this.Controls.Add(this.cmdWorkWithRepository);
             this.Controls.Add(this.button1);
             this.Name = "frmMain";
-            this.Text = "Form1";
+            this.Text = "UnitOfWork IoC and... demos!";
+            ((System.ComponentModel.ISupportInitialize)(this.dgPearsons)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -81,7 +117,10 @@
 
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button cmdWorkWithRepository;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button cmdHelloHhib;
+        private System.Windows.Forms.Button cmdWorkWithHHibRepo;
+        private System.Windows.Forms.DataGridView dgPearsons;
+        private System.Windows.Forms.Label lblStatistics;
     }
 }
 
