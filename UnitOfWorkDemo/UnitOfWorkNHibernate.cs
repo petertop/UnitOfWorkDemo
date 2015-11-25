@@ -1,4 +1,5 @@
-﻿using StructureMap;
+﻿using NHibernate;
+using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,21 +10,21 @@ using UnitOfWorkDemo.Data.Abstract;
 
 namespace UnitOfWorkDemo
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWorkNhibernate : IUnitOfWork
     {
         // Fields
         private IPearsonRepository _repository;
-
-        private IPearsonRepository _nHibernatePearsonRepo = ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepo");
+        ISessionFactory _sessionFactory = NHibernateFactory.CreateSessionFactory();
+        ISession _session;
+        ITransaction _transaction;
 
         private bool _disposed = false;
 
-        public UnitOfWork(EnumRepositoryType repo)
+        public UnitOfWorkNhibernate()
         {
-            if (repo == EnumRepositoryType.InMemory)
-                _repository = ObjectFactory.GetNamedInstance<IPearsonRepository>("InMemoryRepo");
-            else if (repo == EnumRepositoryType.NHibernate)
-                _repository = ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepo");
+            _session = _sessionFactory.OpenSession();
+            _repository = new NHibernateLighDataRepository(_session);
+            _transaction = _session.BeginTransaction();
         }
 
 
@@ -40,7 +41,17 @@ namespace UnitOfWorkDemo
         // Save
         public void Save()
         {
-            _repository.Save();
+            try
+            {
+                _repository.Save();
+                _transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                _transaction.Rollback();
+                throw;
+            }
+
         }
 
 
@@ -52,6 +63,14 @@ namespace UnitOfWorkDemo
             {
                 if (disposing)
                 {
+                    _transaction.Dispose();
+
+                    _session.Clear();
+                    _session.Close();
+                    _session.Dispose();
+
+                    _sessionFactory.Dispose();
+
                     _repository.Dispose();
                 }
             }

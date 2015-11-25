@@ -34,6 +34,8 @@
             this.cmdWorkWithHHibRepo = new System.Windows.Forms.Button();
             this.dgPearsons = new System.Windows.Forms.DataGridView();
             this.lblStatistics = new System.Windows.Forms.Label();
+            this.cmdNHibLight = new System.Windows.Forms.Button();
+            this.chkRaiseError = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgPearsons)).BeginInit();
             this.SuspendLayout();
             // 
@@ -59,7 +61,7 @@
             // 
             // cmdHelloHhib
             // 
-            this.cmdHelloHhib.Location = new System.Drawing.Point(13, 95);
+            this.cmdHelloHhib.Location = new System.Drawing.Point(121, 37);
             this.cmdHelloHhib.Name = "cmdHelloHhib";
             this.cmdHelloHhib.Size = new System.Drawing.Size(102, 23);
             this.cmdHelloHhib.TabIndex = 2;
@@ -94,11 +96,33 @@
             this.lblStatistics.TabIndex = 5;
             this.lblStatistics.Text = "lblStatistics";
             // 
+            // cmdNHibLight
+            // 
+            this.cmdNHibLight.Location = new System.Drawing.Point(13, 95);
+            this.cmdNHibLight.Name = "cmdNHibLight";
+            this.cmdNHibLight.Size = new System.Drawing.Size(139, 23);
+            this.cmdNHibLight.TabIndex = 6;
+            this.cmdNHibLight.Text = "NHib Light";
+            this.cmdNHibLight.UseVisualStyleBackColor = true;
+            this.cmdNHibLight.Click += new System.EventHandler(this.cmdNHibLight_Click);
+            // 
+            // chkRaiseError
+            // 
+            this.chkRaiseError.AutoSize = true;
+            this.chkRaiseError.Location = new System.Drawing.Point(158, 100);
+            this.chkRaiseError.Name = "chkRaiseError";
+            this.chkRaiseError.Size = new System.Drawing.Size(72, 17);
+            this.chkRaiseError.TabIndex = 7;
+            this.chkRaiseError.Text = "raise error";
+            this.chkRaiseError.UseVisualStyleBackColor = true;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(447, 319);
+            this.Controls.Add(this.chkRaiseError);
+            this.Controls.Add(this.cmdNHibLight);
             this.Controls.Add(this.lblStatistics);
             this.Controls.Add(this.dgPearsons);
             this.Controls.Add(this.cmdWorkWithHHibRepo);
@@ -121,6 +145,8 @@
         private System.Windows.Forms.Button cmdWorkWithHHibRepo;
         private System.Windows.Forms.DataGridView dgPearsons;
         private System.Windows.Forms.Label lblStatistics;
+        private System.Windows.Forms.Button cmdNHibLight;
+        private System.Windows.Forms.CheckBox chkRaiseError;
     }
 }
 
