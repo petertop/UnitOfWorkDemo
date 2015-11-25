@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NHibernate;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,13 +8,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using StructureMap;
+using UnitOfWorkDemo.Data;
+using UnitOfWorkDemo.Data.Abstract;
+using UnitOfWorkDemo.Entities;
 using UnitOfWorkDemo.Services;
 
 namespace UnitOfWorkDemo
 {
     public partial class frmMain : Form
     {
+        // Fields
         public frmMain()
         {
             InitializeComponent();
@@ -23,7 +27,7 @@ namespace UnitOfWorkDemo
         {
             try
             {
-                IMessageService service = ObjectFactory.GetInstance<IMessageService>();
+                IMessageService service = StructureMap.ObjectFactory.GetInstance<IMessageService>();
 
                 MessageBox.Show(service.GetMessage());
             }
@@ -34,31 +38,163 @@ namespace UnitOfWorkDemo
 
         }
 
+
         private void cmdWorkWithRepository_Click(object sender, EventArgs e)
         {
-            using(UnitOfWork work = new UnitOfWork())
+            Dosomething(EnumRepositoryType.InMemory, false);
+            dgPearsons.DataSource = GetAll(EnumRepositoryType.InMemory, false);
+        }
+
+
+        private void cmdWorkWithHHibRepo_Click(object sender, EventArgs e)
+        {
+            Dosomething(EnumRepositoryType.NHibernate, false);
+            dgPearsons.DataSource = GetAll(EnumRepositoryType.NHibernate, false);
+        }
+
+
+        private void cmdHelloHib_Click(object sender, EventArgs e)
+        {
+            var sessionFactory = NHibernateFactory.CreateSessionFactory();
+
+            using (var session = sessionFactory.OpenSession())
             {
-                work.PearsonRepository.Create(new Entities.Pearson { Id = 1, FirstName = "Peter", LastName = "Topolšek" });
-                work.PearsonRepository.Create(new Entities.Pearson { Id = 2, FirstName = "Peter", LastName = "Topolšek" });
-                work.PearsonRepository.Create(new Entities.Pearson { Id = 3, FirstName = "Peter", LastName = "Topolšek" });
-                work.PearsonRepository.Update(new Entities.Pearson { Id = 2, FirstName = "Katarina", LastName = "Ročnik" });
-                work.PearsonRepository.Delete(3);
+                string h_stmt = "FROM Pearson";
 
-                work.Save();
+                IQuery query = session.CreateQuery(h_stmt);
 
-                MessageBox.Show(work.PearsonRepository.Get().Count().ToString());
+                IList<Pearson> pearsonList = query.List<Pearson>();
 
-                string data = string.Join(",", work.PearsonRepository.Get().Select(p=>p.FirstName).ToArray());
+                dgPearsons.DataSource = pearsonList;
 
-                MessageBox.Show(data);
+                lblStatistics.Text = "Total records returned: " + pearsonList.Count;
+
             }
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+
+        #region Methods
+
+        private void Dosomething(EnumRepositoryType repoType, bool light)
         {
-            // todo
-            MessageBox.Show("Hello");
+            int deleteIndex = 0;
+            int editIndex = 0;
+            int count = 0;
+            try
+            {
+                if (light)
+                {
+                    using (UnitOfWorkNhibernate work = new UnitOfWorkNhibernate())
+                    {
+                        string data;
+
+                        count = work.PearsonRepository.Get().Count();
+
+                        work.PearsonRepository.Create(new Entities.Pearson { Id = 1, FirstName = "Peter", LastName = "Topolšek" });
+                        work.PearsonRepository.Create(new Entities.Pearson { Id = 2, FirstName = "Peter", LastName = "Topolšek" });
+                        work.PearsonRepository.Create(new Entities.Pearson { Id = 3, FirstName = "Peter", LastName = "Topolšek" });
+                        //work.Save();
+                        deleteIndex = GetDeleteIndex(count);
+                        editIndex = GetEditIndex(count);
+
+                        data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
+                        MessageBox.Show("Before edit: \n" + data);
+
+
+                        work.PearsonRepository.Update(new Entities.Pearson { Id = 2, FirstName = "Katarina", LastName = "Ročnik" });
+                        work.PearsonRepository.Delete(3);
+                        //work.Save();
+
+                        data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
+                        MessageBox.Show("After edit: \n" + data);
+
+
+                        MessageBox.Show("Final result: \n" + data + "\n Število vseh: " + work.PearsonRepository.Get().Count().ToString());
+
+                        if(chkRaiseError.Checked)
+                            throw new Exception("Error, nothing should be saved");
+
+                        work.Save();
+                    }
+                }
+                else
+                {
+                    using (UnitOfWork work = new UnitOfWork(repoType))
+                    {
+                        string data;
+
+                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
+                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
+                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
+                        work.Save();
+
+                        data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
+                        MessageBox.Show("Before edit: \n" + data);
+
+                        Pearson editPearson = work.PearsonRepository.GetByIndex(1);
+                        
+                        work.PearsonRepository.Update(new Entities.Pearson { Id = 2, FirstName = "Katarina", LastName = "Ročnik" });
+                        work.PearsonRepository.Delete(3);
+                        work.Save();
+
+                        data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
+                        MessageBox.Show("After edit: \n" + data);
+
+
+                        MessageBox.Show("Final result: \n" + data + "\n Število vseh: " + work.PearsonRepository.Get().Count().ToString());
+
+                        if (chkRaiseError.Checked)
+                            throw new Exception("Error, the object was saved, because every method is wraped in transaction");
+
+                        work.Save();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: \n" + ex.Message);
+            }
+           
+        }
+
+        private int GetEditIndex(int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        private int GetDeleteIndex(int count)
+        {
+            if (count > 1)
+                return count - 1;
+            else
+                return count;
+        }
+
+        private IEnumerable<Pearson> GetAll(EnumRepositoryType repoType, bool light)
+        {
+            if (light)
+            {
+                using (UnitOfWorkNhibernate work = new UnitOfWorkNhibernate())
+                {
+                    return work.PearsonRepository.Get();
+                }
+            }
+            else
+            {
+                using (UnitOfWork work = new UnitOfWork(repoType))
+                {
+                    return work.PearsonRepository.Get();
+                }
+            }
+            
+        }
+        #endregion
+
+        private void cmdNHibLight_Click(object sender, EventArgs e)
+        {
+            Dosomething(EnumRepositoryType.NHibernate, true);
+            dgPearsons.DataSource = GetAll(EnumRepositoryType.NHibernate, true);
         }
     }
 }
