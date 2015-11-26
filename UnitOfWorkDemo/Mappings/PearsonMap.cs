@@ -9,6 +9,7 @@ using UnitOfWorkDemo.Entities;
 namespace UnitOfWorkDemo.Mappings
 {
     // http://www.kode-blog.com/2014/04/fluent-nhibernate-tutorial-c-windows-crud-example/
+    // ToDo http://stackoverflow.com/questions/1381187/simple-fluentnhibernate-parent-child-mapping
     class PearsonMap : ClassMap<Pearson>
     {
         public PearsonMap()
