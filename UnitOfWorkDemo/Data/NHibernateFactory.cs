@@ -7,13 +7,14 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnitOfWorkDemo.Data.Abstract;
 using UnitOfWorkDemo.Entities;
 
 namespace UnitOfWorkDemo.Data
 {
-    public static class NHibernateFactory
+    public class NHibernateFactory: INHibernateSessionFactory
     {
-        public static ISessionFactory CreateSessionFactory()
+        public ISessionFactory CreateSessionFactory()
         {
             ISessionFactory isessionFactory = Fluently.Configure()
                 .Database(MsSqlConfiguration.MsSql2012

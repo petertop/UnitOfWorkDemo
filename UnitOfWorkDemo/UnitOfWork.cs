@@ -13,17 +13,13 @@ namespace UnitOfWorkDemo
     {
         // Fields
         private IPearsonRepository _repository;
-
-        private IPearsonRepository _nHibernatePearsonRepo = ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepo");
-
         private bool _disposed = false;
+        private EnumRepositoryType _repoType;
 
-        public UnitOfWork(EnumRepositoryType repo)
+        [StructureMap.DefaultConstructor]
+        public UnitOfWork(IPearsonRepository repo)
         {
-            if (repo == EnumRepositoryType.InMemory)
-                _repository = ObjectFactory.GetNamedInstance<IPearsonRepository>("InMemoryRepo");
-            else if (repo == EnumRepositoryType.NHibernate)
-                _repository = ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepo");
+            _repository = repo;
         }
 
 
@@ -32,7 +28,22 @@ namespace UnitOfWorkDemo
         {
             get
             {
+                if (_repoType == EnumRepositoryType.InMemory)
+                    _repository = ObjectFactory.GetNamedInstance<IPearsonRepository>("InMemoryRepo");
+                else if (_repoType == EnumRepositoryType.NHibernate)
+                    _repository = ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepo");
                 return _repository;
+            }
+        }
+
+
+        public EnumRepositoryType RepositoryType
+        {
+            get {
+                return _repoType;
+            }
+            set {
+                _repoType = value;
             }
         }
 

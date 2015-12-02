@@ -65,11 +65,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\Abstract\INHibernateSessionFactory.cs" />
     <Compile Include="Data\Abstract\IPearsonRepository.cs" />
     <Compile Include="Data\InMemoryDataRepository.cs" />
     <Compile Include="Data\NHibernateLightDataRepository.cs" />
     <Compile Include="Data\NHibernateDataRepository.cs" />
     <Compile Include="Data\NHibernateFactory.cs" />
+    <Compile Include="Data\NHibernateStaticFactory.cs" />
     <Compile Include="Helpers\Entities\Pearson.cs" />
     <Compile Include="EnumRepositoryType.cs" />
     <Compile Include="frmMain.cs">

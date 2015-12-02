@@ -17,10 +17,45 @@ namespace UnitOfWorkDemo
         {
             ObjectFactory.Initialize(x =>
             {
-                x.For<IMessageService>().Use<MessageServiceB>();
-                x.For<IPearsonRepository>().Use<InMemoryDataRepository>().Named("InMemoryRepo");
-                x.For<IPearsonRepository>().Use<NHibernateDataRepository>().Named("NHibRepo");
+                // Services
+                x.For<IMessageService>()
+                    .Use<MessageServiceB>();
+
+                // NHibernate SessionFactory
+                x.For<INHibernateSessionFactory>()
+                    .Use<NHibernateFactory>();
+
+                // Repository
+                x.For<IPearsonRepository>()
+                    .Use<InMemoryDataRepository>().Named("InMemoryRepo")
+                    .Ctor<EnumRepositoryType>()
+                        .Is(ctx => EnumRepositoryType.InMemory);
+
+                x.For<IPearsonRepository>()
+                    .Use<NHibernateDataRepository>().Named("NHibRepo")
+                    .Ctor<EnumRepositoryType>()
+                        .Is(ctx => EnumRepositoryType.NHibernate);
+
+                x.For<IPearsonRepository>()
+                    .Use<NHibernateLighDataRepository>().Named("NHibRepoLight")
+                    .Ctor<ISession>()
+                        .Is(ctx => NHibernateStaticFactory.CreateSessionFactory().OpenSession());
+
+                // UnitOfWork
+                x.For<IUnitOfWork>()
+                .Use<UnitOfWork>().Named("BasicUOWNHib");
+
+
+                x.For<IUnitOfWork>()
+                .Use<UnitOfWork>().Named("BasicUOWInMemory");
+
+
+                x.For<IUnitOfWork>()
+                .Use<UnitOfWorkNhibernate>().Named("LightUOW")
+                .Ctor<ISession>()
+                     .Is(ctx => NHibernateStaticFactory.CreateSessionFactory().OpenSession());
             });
+
             return ObjectFactory.Container;
         }
 

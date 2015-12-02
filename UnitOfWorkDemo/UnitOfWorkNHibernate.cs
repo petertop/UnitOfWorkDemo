@@ -14,16 +14,18 @@ namespace UnitOfWorkDemo
     {
         // Fields
         private IPearsonRepository _repository;
-        ISessionFactory _sessionFactory = NHibernateFactory.CreateSessionFactory();
-        ISession _session;
-        ITransaction _transaction;
+        private ISession _session;
+        private ITransaction _transaction;
+        private EnumRepositoryType _repoType;
 
         private bool _disposed = false;
 
-        public UnitOfWorkNhibernate()
+        public UnitOfWorkNhibernate(ISession session)
         {
-            _session = _sessionFactory.OpenSession();
+            _session = session;
+            // this is not IoC code, it is direct dependency
             _repository = new NHibernateLighDataRepository(_session);
+            //_repository = ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepoLight");
             _transaction = _session.BeginTransaction();
         }
 
@@ -34,6 +36,18 @@ namespace UnitOfWorkDemo
             get
             {
                 return _repository;
+            }
+        }
+
+        public EnumRepositoryType RepositoryType
+        {
+            get
+            {
+                return _repoType;
+            }
+            set
+            {
+                _repoType = value;
             }
         }
 
@@ -49,7 +63,7 @@ namespace UnitOfWorkDemo
             catch (Exception ex)
             {
                 _transaction.Rollback();
-                throw;
+                throw ex;
             }
 
         }
@@ -68,8 +82,6 @@ namespace UnitOfWorkDemo
                     _session.Clear();
                     _session.Close();
                     _session.Dispose();
-
-                    _sessionFactory.Dispose();
 
                     _repository.Dispose();
                 }

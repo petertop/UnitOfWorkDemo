@@ -55,15 +55,27 @@ namespace UnitOfWorkDemo
 
         private void cmdHelloHib_Click(object sender, EventArgs e)
         {
-            var sessionFactory = NHibernateFactory.CreateSessionFactory();
+            IList<Pearson> pearsonList = null;
 
-            using (var session = sessionFactory.OpenSession())
+            IPearsonRepository pearsonRepo = StructureMap.ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepo");
+
+            pearsonList = pearsonRepo.Get().ToList();
+
+            dgPearsons.DataSource = pearsonList;
+
+            lblStatistics.Text = "Total records returned: " + pearsonList.Count;
+
+            return;
+
+            INHibernateSessionFactory sessionFactory = StructureMap.ObjectFactory.GetInstance<INHibernateSessionFactory>();
+
+            using (var session = sessionFactory.CreateSessionFactory().OpenSession())
             {
                 string h_stmt = "FROM Pearson";
 
                 IQuery query = session.CreateQuery(h_stmt);
 
-                IList<Pearson> pearsonList = query.List<Pearson>();
+                pearsonList = query.List<Pearson>();
 
                 dgPearsons.DataSource = pearsonList;
 
@@ -85,32 +97,42 @@ namespace UnitOfWorkDemo
             {
                 if (light)
                 {
-                    using (UnitOfWorkNhibernate work = new UnitOfWorkNhibernate())
+                    // This is UOW example with embedet NHibernate transaction
+                    using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("LightUOW"))
                     {
                         string data;
 
+                        // Get current count
                         count = work.PearsonRepository.Get().Count();
 
-                        work.PearsonRepository.Create(new Entities.Pearson { Id = 1, FirstName = "Peter", LastName = "Topolšek" });
-                        work.PearsonRepository.Create(new Entities.Pearson { Id = 2, FirstName = "Peter", LastName = "Topolšek" });
-                        work.PearsonRepository.Create(new Entities.Pearson { Id = 3, FirstName = "Peter", LastName = "Topolšek" });
+                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
+                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
+                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
                         //work.Save();
                         deleteIndex = GetDeleteIndex(count);
                         editIndex = GetEditIndex(count);
 
                         data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
-                        MessageBox.Show("Before edit: \n" + data);
+                        //MessageBox.Show("Before edit: \n" + data);
+
+                        Pearson updatePearson = work.PearsonRepository.Get().ToArray()[editIndex];
+
+                        updatePearson.FirstName = "Katarina";
+                        updatePearson.LastName = "Ročnik";
 
 
-                        work.PearsonRepository.Update(new Entities.Pearson { Id = 2, FirstName = "Katarina", LastName = "Ročnik" });
-                        work.PearsonRepository.Delete(3);
+                        work.PearsonRepository.Update(updatePearson);
+
+                        Pearson deletePearson = work.PearsonRepository.Get().ToArray()[deleteIndex];
+
+                        work.PearsonRepository.Delete(deletePearson.Id);
                         //work.Save();
 
                         data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
-                        MessageBox.Show("After edit: \n" + data);
+                        //MessageBox.Show("After edit: \n" + data);
 
 
-                        MessageBox.Show("Final result: \n" + data + "\n Število vseh: " + work.PearsonRepository.Get().Count().ToString());
+                        //MessageBox.Show("Final result: \n" + data + "\n Število vseh: " + work.PearsonRepository.Get().Count().ToString());
 
                         if(chkRaiseError.Checked)
                             throw new Exception("Error, nothing should be saved");
@@ -120,8 +142,9 @@ namespace UnitOfWorkDemo
                 }
                 else
                 {
-                    using (UnitOfWork work = new UnitOfWork(repoType))
+                    using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("BasicUOWNHib"))
                     {
+                        work.RepositoryType = EnumRepositoryType.NHibernate;
                         string data;
 
                         work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
@@ -160,7 +183,10 @@ namespace UnitOfWorkDemo
 
         private int GetEditIndex(int count)
         {
-            throw new NotImplementedException();
+            if (count > 2)
+                return count - 2;
+            else
+                return count;
         }
 
         private int GetDeleteIndex(int count)
@@ -173,20 +199,25 @@ namespace UnitOfWorkDemo
 
         private IEnumerable<Pearson> GetAll(EnumRepositoryType repoType, bool light)
         {
+            IList<Pearson> pearsonList = null;
             if (light)
             {
-                using (UnitOfWorkNhibernate work = new UnitOfWorkNhibernate())
+                using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("LightUOW"))
                 {
-                    return work.PearsonRepository.Get();
+                    work.RepositoryType = EnumRepositoryType.NHibernate;
+                    pearsonList = work.PearsonRepository.Get().ToList();
                 }
             }
             else
             {
-                using (UnitOfWork work = new UnitOfWork(repoType))
+                using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("BasicUOWNHib"))
                 {
-                    return work.PearsonRepository.Get();
+                    work.RepositoryType = EnumRepositoryType.NHibernate;
+                    pearsonList = work.PearsonRepository.Get().ToList();
                 }
             }
+
+            return pearsonList;
             
         }
         #endregion
