@@ -13,7 +13,7 @@ namespace UnitOfWorkDemo.Data
     {
         // Fields
         private bool disposedValue = false; // To detect redundant calls
-        ISessionFactory sessionFactory = NHibernateFactory.CreateSessionFactory();
+        ISessionFactory sessionFactory = NHibernateStaticFactory.CreateSessionFactory();
 
 
 
