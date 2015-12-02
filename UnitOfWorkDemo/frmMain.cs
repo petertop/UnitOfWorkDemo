@@ -160,7 +160,10 @@ namespace UnitOfWorkDemo
 
         private int GetEditIndex(int count)
         {
-            throw new NotImplementedException();
+            if (count > 2)
+                return count - 2;
+            else
+                return count;
         }
 
         private int GetDeleteIndex(int count)
