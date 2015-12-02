@@ -25,6 +25,8 @@ namespace UnitOfWorkDemo
             _session = session;
             // this is not IoC code, it is direct dependency
             _repository = new NHibernateLighDataRepository(_session);
+
+            // this will not work, save is nost commited
             //_repository = ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepoLight");
             _transaction = _session.BeginTransaction();
         }
