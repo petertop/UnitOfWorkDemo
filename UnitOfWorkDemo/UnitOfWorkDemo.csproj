@@ -66,13 +66,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Abstract\INHibernateSessionFactory.cs" />
+    <Compile Include="Data\Abstract\IOrderRepository.cs" />
     <Compile Include="Data\Abstract\IPearsonRepository.cs" />
+    <Compile Include="Data\Abstract\IRepository.cs" />
+    <Compile Include="Data\GenericSessionFactory.cs" />
+    <Compile Include="Data\RepositoryGeneric.cs" />
     <Compile Include="Data\InMemoryDataRepository.cs" />
     <Compile Include="Data\NHibernateLightDataRepository.cs" />
     <Compile Include="Data\NHibernateDataRepository.cs" />
     <Compile Include="Data\NHibernateFactory.cs" />
     <Compile Include="Data\NHibernateStaticFactory.cs" />
-    <Compile Include="Helpers\Entities\Pearson.cs" />
+    <Compile Include="Entities\Order.cs" />
+    <Compile Include="Entities\Pearson.cs" />
     <Compile Include="EnumRepositoryType.cs" />
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
@@ -82,12 +87,15 @@
     </Compile>
     <Compile Include="IoCWrapper.cs" />
     <Compile Include="IUnitOfWork.cs" />
+    <Compile Include="IUnitOfWorkGeneric.cs" />
+    <Compile Include="Mappings\OrderMap.cs" />
     <Compile Include="Mappings\PearsonMap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IMessageService.cs" />
     <Compile Include="Services\MessageServiceA.cs" />
     <Compile Include="Services\MessageServiceB.cs" />
+    <Compile Include="UnitOfWorkGeneric.cs" />
     <Compile Include="UnitOfWorkNHibernate.cs" />
     <Compile Include="UnitOfWork.cs" />
     <EmbeddedResource Include="frmMain.resx">

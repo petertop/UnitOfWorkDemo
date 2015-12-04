@@ -45,11 +45,6 @@ namespace UnitOfWorkDemo
                 x.For<IUnitOfWork>()
                 .Use<UnitOfWork>().Named("BasicUOWNHib");
 
-
-                x.For<IUnitOfWork>()
-                .Use<UnitOfWork>().Named("BasicUOWInMemory");
-
-
                 x.For<IUnitOfWork>()
                 .Use<UnitOfWorkNhibernate>().Named("LightUOW")
                 .Ctor<ISession>()

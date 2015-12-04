@@ -36,7 +36,13 @@
             this.lblStatistics = new System.Windows.Forms.Label();
             this.cmdNHibLight = new System.Windows.Forms.Button();
             this.chkRaiseError = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.dgOrders = new System.Windows.Forms.DataGridView();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cmdUseGenericRepo = new System.Windows.Forms.Button();
+            this.chkShowMessages = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgPearsons)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgOrders)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -82,9 +88,9 @@
             // dgPearsons
             // 
             this.dgPearsons.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgPearsons.Location = new System.Drawing.Point(13, 124);
+            this.dgPearsons.Location = new System.Drawing.Point(11, 142);
             this.dgPearsons.Name = "dgPearsons";
-            this.dgPearsons.Size = new System.Drawing.Size(422, 183);
+            this.dgPearsons.Size = new System.Drawing.Size(679, 183);
             this.dgPearsons.TabIndex = 4;
             // 
             // lblStatistics
@@ -116,11 +122,62 @@
             this.chkRaiseError.Text = "raise error";
             this.chkRaiseError.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(11, 125);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(54, 13);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "Pearsons:";
+            // 
+            // dgOrders
+            // 
+            this.dgOrders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgOrders.Location = new System.Drawing.Point(11, 371);
+            this.dgOrders.Name = "dgOrders";
+            this.dgOrders.Size = new System.Drawing.Size(679, 202);
+            this.dgOrders.TabIndex = 9;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(10, 347);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(41, 13);
+            this.label2.TabIndex = 10;
+            this.label2.Text = "Orders:";
+            // 
+            // cmdUseGenericRepo
+            // 
+            this.cmdUseGenericRepo.Location = new System.Drawing.Point(230, 37);
+            this.cmdUseGenericRepo.Name = "cmdUseGenericRepo";
+            this.cmdUseGenericRepo.Size = new System.Drawing.Size(106, 23);
+            this.cmdUseGenericRepo.TabIndex = 11;
+            this.cmdUseGenericRepo.Text = "UseGeneric";
+            this.cmdUseGenericRepo.UseVisualStyleBackColor = true;
+            this.cmdUseGenericRepo.Click += new System.EventHandler(this.cmdUseGenericRepo_Click);
+            // 
+            // chkShowMessages
+            // 
+            this.chkShowMessages.AutoSize = true;
+            this.chkShowMessages.Location = new System.Drawing.Point(237, 100);
+            this.chkShowMessages.Name = "chkShowMessages";
+            this.chkShowMessages.Size = new System.Drawing.Size(101, 17);
+            this.chkShowMessages.TabIndex = 12;
+            this.chkShowMessages.Text = "show messages";
+            this.chkShowMessages.UseVisualStyleBackColor = true;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(447, 319);
+            this.ClientSize = new System.Drawing.Size(704, 601);
+            this.Controls.Add(this.chkShowMessages);
+            this.Controls.Add(this.cmdUseGenericRepo);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.dgOrders);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.chkRaiseError);
             this.Controls.Add(this.cmdNHibLight);
             this.Controls.Add(this.lblStatistics);
@@ -132,6 +189,7 @@
             this.Name = "frmMain";
             this.Text = "UnitOfWork IoC and... demos!";
             ((System.ComponentModel.ISupportInitialize)(this.dgPearsons)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgOrders)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -147,6 +205,11 @@
         private System.Windows.Forms.Label lblStatistics;
         private System.Windows.Forms.Button cmdNHibLight;
         private System.Windows.Forms.CheckBox chkRaiseError;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.DataGridView dgOrders;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button cmdUseGenericRepo;
+        private System.Windows.Forms.CheckBox chkShowMessages;
     }
 }
 

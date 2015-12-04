@@ -14,9 +14,14 @@ namespace UnitOfWorkDemo.Mappings
     {
         public PearsonMap()
         {
-            Id(x => x.Id);
+            Id(x => x.Id).GeneratedBy.Identity();
             Map(x => x.FirstName);
             Map(x => x.LastName);
+            HasMany(x => x.Orders)
+                .KeyColumn("OrdersId")
+                .Inverse()
+                .Cascade.All();
+            Table("Pearson");
         }
     }
 }
