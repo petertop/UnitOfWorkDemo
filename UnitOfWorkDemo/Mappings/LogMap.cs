@@ -10,18 +10,14 @@ namespace UnitOfWorkDemo.Mappings
 {
     // http://www.kode-blog.com/2014/04/fluent-nhibernate-tutorial-c-windows-crud-example/
     // ToDo http://stackoverflow.com/questions/1381187/simple-fluentnhibernate-parent-child-mapping
-    class PearsonMap : ClassMap<Pearson>
+    public class LogMap : ClassMap<Log>
     {
-        public PearsonMap()
+        public LogMap()
         {
             Id(x => x.Id).GeneratedBy.Identity();
-            Map(x => x.FirstName);
-            Map(x => x.LastName);
-            HasMany(x => x.Orders)
-                .KeyColumn("PersonId")
-                .Inverse()
-                .Cascade.All();
-            Table("[Pearson]");
+            Map(x => x.Description);
+            Map(x => x.Created);
+            Table("[Log]");
         }
     }
 }

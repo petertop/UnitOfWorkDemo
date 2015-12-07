@@ -25,11 +25,13 @@ namespace UnitOfWorkDemo.Data
             _session = session;
         }
 
-        public void Create(T entity)
+
+        public T Create(T entity)
         {
             try
             {
                 _session.Save(entity);
+                return entity;
 
             }
             catch (Exception ex)
@@ -37,6 +39,7 @@ namespace UnitOfWorkDemo.Data
                 throw ex;
             }
         }
+
 
         public void Delete(int id)
         {
@@ -50,15 +53,18 @@ namespace UnitOfWorkDemo.Data
             }
         }
 
+
         public IQueryable<T> GetAll()
         {
             return _session.Query<T>();
         }
 
+
         public T GetById(int id)
         {
             return _session.Get<T>(id);
         }
+
 
         public void Update(T entity)
         {
@@ -71,6 +77,7 @@ namespace UnitOfWorkDemo.Data
                 throw ex;
             }
         }
+
 
         #region IDisposable Support
 

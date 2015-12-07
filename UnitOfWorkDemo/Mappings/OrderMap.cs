@@ -17,8 +17,9 @@ namespace UnitOfWorkDemo.Mappings
             Map(x => x.Subject);
             Map(x => x.Price);
             References(x => x.Pearson)
-                .Column("PerconId");
-            Table("Order");
+                .LazyLoad().Cascade.None()
+                .Column("PersonId");
+            Table("[Order]");
         }
     }
 }

@@ -45,20 +45,24 @@ namespace UnitOfWorkDemo
 
         private void cmdWorkWithRepository_Click(object sender, EventArgs e)
         {
-            IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("BasicUOWNHib");
+            using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("BasicUOWNHib"))
+            {
+                work.RepositoryType = EnumRepositoryType.NHibernate;
+                Dosomething(EnumRepositoryType.InMemory, false, work, chkShowMessages.Checked);
+            }
 
-            work.RepositoryType = EnumRepositoryType.NHibernate;
-
-            Dosomething(EnumRepositoryType.InMemory, false, work, chkShowMessages.Checked);
             dgPearsons.DataSource = GetAll(EnumRepositoryType.InMemory, false);
         }
 
 
         private void cmdWorkWithHHibRepo_Click(object sender, EventArgs e)
         {
-            IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("LightUOW");
+            using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("LightUOW"))
+            {
+                work.RepositoryType = EnumRepositoryType.NHibernate;
+                Dosomething(EnumRepositoryType.NHibernate, true, work, chkShowMessages.Checked);
+            }
 
-            Dosomething(EnumRepositoryType.NHibernate, true, work, chkShowMessages.Checked);
             dgPearsons.DataSource = GetAll(EnumRepositoryType.NHibernate, false);
         }
 
@@ -73,7 +77,7 @@ namespace UnitOfWorkDemo
 
             dgPearsons.DataSource = pearsonList;
 
-            lblStatistics.Text = "Total records returned: " + pearsonList.Count;
+            lblStatistics.Text = "Total pearsons returned: " + pearsonList.Count;
 
             return;
 
@@ -109,6 +113,8 @@ namespace UnitOfWorkDemo
 
                 // Get current count
                 count = work.PearsonRepository.Get().Count();
+
+                lblStatistics.Text = "Total pearsons returned: " + count.ToString();
 
                 work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
                 work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
@@ -150,6 +156,48 @@ namespace UnitOfWorkDemo
                     throw new Exception("Error, nothing should be saved or everything, depends of UOW provider you pick...");
 
                 work.Save();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: \n" + ex.Message);
+            }
+        }
+
+
+        private void DosomethingWithOrders(EnumRepositoryType repoType, bool useSingleTransaction, IUnitOfWorkGeneric work, bool showMessages)
+        {
+            int editIndex = 0;
+            int count = 0;
+            try
+            {
+                // Get current count
+                count = work.PearsonRepository.GetAll().Count();
+
+                lblStatistics.Text = "Total pearsons returned: " + count.ToString();
+
+
+                // Add new pearson and orders
+                Pearson newPearson = new Entities.Pearson { FirstName = "Marko", LastName = "Novak" };
+
+                newPearson = work.PearsonRepository.Create(newPearson);
+
+                newPearson = work.PearsonRepository.GetById(newPearson.Id);
+
+                newPearson.Orders.Add(new Order { Pearson= newPearson, Price = 45, Subject = "Some demo text..." });
+
+                newPearson.Orders.Add(new Order { Pearson = newPearson, Price = 53, Subject = "More demo text..." });
+
+                // Add Orders on created pearson
+                editIndex = GetEditIndex(count);
+
+                lblStatistics.Text = lblStatistics.Text + ", Edit index: " + editIndex.ToString();
+
+                Pearson updatePearson = work.PearsonRepository.GetAll().ToArray()[editIndex];
+
+                updatePearson.Orders.Add(new Order { Pearson = updatePearson, Price = 45, Subject = "Some demo text..." });
+
+                updatePearson.Orders.Add(new Order { Pearson = updatePearson, Price = 53, Subject = "More demo text..." });
 
             }
             catch (Exception ex)
@@ -211,18 +259,66 @@ namespace UnitOfWorkDemo
             try
             {
                 IList<Pearson> pearsonList = null;
+                IList<Order> ordersList = null;
+                IList<Log> logList = null;
 
-                using (UnitOfWorkGeneric work = new UnitOfWorkGeneric())
+                using (IUnitOfWorkGeneric genericWork = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWorkGeneric>("GenericUOW"))
                 {
-                    pearsonList = work.PearsonRepository.GetAll().ToList();
+                    genericWork.BeginTransaction();
+
+                    genericWork.LogRepository.Create(new Log { Description = "Test", Created = DateTime.Now });
+
+                    DosomethingWithOrders(EnumRepositoryType.NHibernate, chkRaiseError.Checked, genericWork, false);
+
+                    if (chkRaiseError.Checked)
+                        throw new Exception("Error, abort transaction...");
+
+                    genericWork.Commit();
+                }
+
+                using (IUnitOfWorkGeneric genericWork = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWorkGeneric>("GenericUOW"))
+                {
+                    ordersList = genericWork.OrderRepository.GetAll().ToList();
+                    pearsonList = genericWork.PearsonRepository.GetAll().ToList();
+                    logList = genericWork.LogRepository.GetAll().ToList();
                 }
 
                 dgPearsons.DataSource = pearsonList;
+                //c1FlexGrid1.DataSource = pearsonList;
+                dgOrders.DataSource = ordersList;
+                dgLogs.DataSource = logList;
+
+                
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
 
+            }
+        }
+
+        private void cmdOrderDemo_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //ISessionFactory sessionFactory = NHibernateStaticFactory.CreateSessionFactory();
+                //List<Order> ordersList = null;
+
+                //using (var session = sessionFactory.OpenSession())
+                //{
+                //    string h_stmt = "FROM Order";
+
+                //    IQuery query = session.CreateQuery(h_stmt);
+
+                //    ordersList = query.List<Order>().ToList<Order>();
+
+                //    dgOrders.DataSource = ordersList;
+                //}
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
             }
         }
     }

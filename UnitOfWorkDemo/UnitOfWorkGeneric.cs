@@ -21,6 +21,7 @@ namespace UnitOfWorkDemo
         private ITransaction _transaction;
         private RepositoryGeneric<Pearson> _pearsonRepository;
         private RepositoryGeneric<Order> _orderRepository;
+        private RepositoryGeneric<Log> _logRepository;
 
 
         // Constructor
@@ -29,12 +30,15 @@ namespace UnitOfWorkDemo
             _session = NHibernateStaticFactory.CreateSessionFactory().OpenSession();
             _pearsonRepository = new RepositoryGeneric<Pearson>(_session);
             _orderRepository = new RepositoryGeneric<Order>(_session);
+            _logRepository = new RepositoryGeneric<Log>(_session);
 
         }
 
 
-        public RepositoryGeneric<Pearson> PearsonRepository {
-            get {
+        public RepositoryGeneric<Pearson> PearsonRepository
+        {
+            get
+            {
                 return _pearsonRepository;
             }
         }
@@ -48,13 +52,24 @@ namespace UnitOfWorkDemo
             }
         }
 
+        public RepositoryGeneric<Log> LogRepository
+        {
+            get
+            {
+                return _logRepository;
+            }
+        }
+
 
         // Properties
-        public ISession Session {
-            get {
+        public ISession Session
+        {
+            get
+            {
                 return _session;
             }
-            private set {
+            private set
+            {
                 _session = value;
             }
         }
@@ -79,6 +94,7 @@ namespace UnitOfWorkDemo
             }
             finally
             {
+                _session.Clear();
                 _session.Close();
             }
 
@@ -92,10 +108,9 @@ namespace UnitOfWorkDemo
             {
                 if (disposing)
                 {
-                    _transaction.Dispose();
+                    if (_transaction != null)
+                        _transaction.Dispose();
 
-                    _session.Clear();
-                    _session.Close();
                     _session.Dispose();
 
                     _pearsonRepository.Dispose();

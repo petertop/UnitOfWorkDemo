@@ -41,8 +41,12 @@
             this.label2 = new System.Windows.Forms.Label();
             this.cmdUseGenericRepo = new System.Windows.Forms.Button();
             this.chkShowMessages = new System.Windows.Forms.CheckBox();
+            this.cmdOrderDemo = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.dgLogs = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.dgPearsons)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgOrders)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgLogs)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -90,7 +94,7 @@
             this.dgPearsons.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgPearsons.Location = new System.Drawing.Point(11, 142);
             this.dgPearsons.Name = "dgPearsons";
-            this.dgPearsons.Size = new System.Drawing.Size(679, 183);
+            this.dgPearsons.Size = new System.Drawing.Size(679, 142);
             this.dgPearsons.TabIndex = 4;
             // 
             // lblStatistics
@@ -134,15 +138,15 @@
             // dgOrders
             // 
             this.dgOrders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgOrders.Location = new System.Drawing.Point(11, 371);
+            this.dgOrders.Location = new System.Drawing.Point(11, 311);
             this.dgOrders.Name = "dgOrders";
-            this.dgOrders.Size = new System.Drawing.Size(679, 202);
+            this.dgOrders.Size = new System.Drawing.Size(679, 134);
             this.dgOrders.TabIndex = 9;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 347);
+            this.label2.Location = new System.Drawing.Point(10, 287);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(41, 13);
             this.label2.TabIndex = 10;
@@ -168,11 +172,41 @@
             this.chkShowMessages.Text = "show messages";
             this.chkShowMessages.UseVisualStyleBackColor = true;
             // 
+            // cmdOrderDemo
+            // 
+            this.cmdOrderDemo.Location = new System.Drawing.Point(343, 36);
+            this.cmdOrderDemo.Name = "cmdOrderDemo";
+            this.cmdOrderDemo.Size = new System.Drawing.Size(125, 23);
+            this.cmdOrderDemo.TabIndex = 13;
+            this.cmdOrderDemo.Text = "Single Order Demo";
+            this.cmdOrderDemo.UseVisualStyleBackColor = true;
+            this.cmdOrderDemo.Click += new System.EventHandler(this.cmdOrderDemo_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(11, 452);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(33, 13);
+            this.label3.TabIndex = 14;
+            this.label3.Text = "Logs:";
+            // 
+            // dgLogs
+            // 
+            this.dgLogs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgLogs.Location = new System.Drawing.Point(11, 469);
+            this.dgLogs.Name = "dgLogs";
+            this.dgLogs.Size = new System.Drawing.Size(679, 140);
+            this.dgLogs.TabIndex = 15;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(704, 601);
+            this.ClientSize = new System.Drawing.Size(704, 621);
+            this.Controls.Add(this.dgLogs);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.cmdOrderDemo);
             this.Controls.Add(this.chkShowMessages);
             this.Controls.Add(this.cmdUseGenericRepo);
             this.Controls.Add(this.label2);
@@ -190,6 +224,7 @@
             this.Text = "UnitOfWork IoC and... demos!";
             ((System.ComponentModel.ISupportInitialize)(this.dgPearsons)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgOrders)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgLogs)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -210,6 +245,9 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button cmdUseGenericRepo;
         private System.Windows.Forms.CheckBox chkShowMessages;
+        private System.Windows.Forms.Button cmdOrderDemo;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.DataGridView dgLogs;
     }
 }
 

@@ -11,7 +11,7 @@ namespace UnitOfWorkDemo.Data.Abstract
     {
         IQueryable<T> GetAll();
         T GetById(int id);
-        void Create(T entity);
+        T Create(T entity);
         void Update(T entity);
         void Delete(int id);
     }

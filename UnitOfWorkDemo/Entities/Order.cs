@@ -13,5 +13,10 @@ namespace UnitOfWorkDemo.Entities
         public virtual string Subject { get; set; }
         public virtual decimal Price { get; set; }
         public virtual Pearson Pearson { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{0}-{1}-{2}", Id.ToString(),Subject,Price.ToString());
+        }
     }
 }
