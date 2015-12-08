@@ -8,6 +8,9 @@ using UnitOfWorkDemo.Entities;
 
 namespace UnitOfWorkDemo.Data
 {
+    /// <summary>
+    /// No concrete implementation, only in memory
+    /// </summary>
     public class InMemoryDataRepository : IPearsonRepository
     {
         // Fields

@@ -32,6 +32,9 @@ namespace UnitOfWorkDemo
             _orderRepository = new RepositoryGeneric<Order>(_session);
             _logRepository = new RepositoryGeneric<Log>(_session);
 
+            // Always start transaction
+            _transaction = Session.BeginTransaction();
+
         }
 
 
@@ -77,7 +80,8 @@ namespace UnitOfWorkDemo
 
         public void BeginTransaction()
         {
-            _transaction = Session.BeginTransaction();
+            if (_transaction == null)
+                _transaction = Session.BeginTransaction();
         }
 
 
@@ -108,6 +112,9 @@ namespace UnitOfWorkDemo
             {
                 if (disposing)
                 {
+                    if (_transaction != null && !_transaction.WasCommitted)
+                        _transaction.Commit();
+
                     if (_transaction != null)
                         _transaction.Dispose();
 

@@ -9,6 +9,11 @@ using UnitOfWorkDemo.Entities;
 
 namespace UnitOfWorkDemo.Data
 {
+    /// <summary>
+    /// This repository is self independent. 
+    /// Transactions over that repository does not have imact on object, Session and Transactions in the object...
+    /// Session object is created inside the repository
+    /// </summary>
     public class NHibernateDataRepository : IPearsonRepository
     {
         // Fields
@@ -75,6 +80,7 @@ namespace UnitOfWorkDemo.Data
             }
         }
 
+
         IEnumerable<Pearson> IPearsonRepository.Get()
         {
             using (var session = sessionFactory.OpenSession())
@@ -88,6 +94,7 @@ namespace UnitOfWorkDemo.Data
                 return pearsonList;
             }
         }
+
 
         Pearson IPearsonRepository.GetByIndex(int index)
         {
@@ -110,10 +117,12 @@ namespace UnitOfWorkDemo.Data
             }
         }
 
+
         bool IPearsonRepository.Save()
         {
             return true;
         }
+
 
         bool IPearsonRepository.Update(Pearson item)
         {
@@ -147,6 +156,7 @@ namespace UnitOfWorkDemo.Data
                 }
             }
         }
+
 
         #region IDisposable Support
         protected virtual void Dispose(bool disposing)

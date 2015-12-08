@@ -36,6 +36,7 @@ namespace UnitOfWorkDemo
                     .Ctor<EnumRepositoryType>()
                         .Is(ctx => EnumRepositoryType.NHibernate);
 
+
                 x.For<IPearsonRepository>()
                     .Use<NHibernateLighDataRepository>().Named("NHibRepoLight")
                     .Ctor<ISession>()
