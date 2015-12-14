@@ -116,6 +116,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="CodeMap1.dgml" />
+    <None Include="Graph1.dgml" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\UnitOfWorkDemo.Entities.Pearson.datasource" />
     <None Include="Properties\Settings.settings">
