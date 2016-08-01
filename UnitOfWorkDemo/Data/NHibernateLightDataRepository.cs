@@ -9,6 +9,10 @@ using UnitOfWorkDemo.Entities;
 
 namespace UnitOfWorkDemo.Data
 {
+    /// <summary>
+    /// This implemenation gets session outside of class scope
+    /// Transaction is handled outside of Repository
+    /// </summary>
     public class NHibernateLighDataRepository : IPearsonRepository
     {
         // Fields
@@ -100,6 +104,7 @@ namespace UnitOfWorkDemo.Data
             return true;
         }
 
+
         bool IPearsonRepository.Update(Pearson item)
         {
             try
@@ -122,6 +127,7 @@ namespace UnitOfWorkDemo.Data
             }
 
         }
+
 
         #region IDisposable Support
         protected virtual void Dispose(bool disposing)

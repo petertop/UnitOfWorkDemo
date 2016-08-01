@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnitOfWorkDemo.Data.Abstract;
 using UnitOfWorkDemo.Entities;
+using UnitOfWorkDemo.Mappings;
 
 namespace UnitOfWorkDemo.Data
 {
@@ -16,14 +17,7 @@ namespace UnitOfWorkDemo.Data
     {
         public ISessionFactory CreateSessionFactory()
         {
-            ISessionFactory isessionFactory = Fluently.Configure()
-                .Database(MsSqlConfiguration.MsSql2012
-                .ConnectionString(ConfigurationSettings.AppSettings.Get("NHibCnnString")))
-                .Mappings(m => m
-                .FluentMappings.AddFromAssemblyOf<Pearson>())
-                .BuildSessionFactory();
-
-            return isessionFactory;
+            return NHibernateStaticFactory.CreateSessionFactory();
         }
     }
 

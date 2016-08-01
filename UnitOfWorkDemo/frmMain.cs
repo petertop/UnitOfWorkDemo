@@ -15,6 +15,10 @@ using UnitOfWorkDemo.Services;
 
 namespace UnitOfWorkDemo
 {
+    // REferences
+    // http://www.codeproject.com/Articles/380022/Simplify-Database-Operations-with-Generic-Fluent-N
+    // http://jasonwatmore.com/post/2015/01/28/Unit-of-Work-Repository-Pattern-in-MVC5-with-Fluent-NHibernate-and-Ninject.aspx
+
     public partial class frmMain : Form
     {
         // Fields
@@ -23,7 +27,70 @@ namespace UnitOfWorkDemo
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+
+        #region Event Handlers
+        private void cmdWorkWithRepository_Click(object sender, EventArgs e)
+        {
+            using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("BasicUOWNHib"))
+            {
+                work.RepositoryType = EnumRepositoryType.NHibernate;
+                Dosomething(EnumRepositoryType.InMemory, false, work, chkShowMessages.Checked);
+            }
+            GetCountsAndFillDataGrids();
+        }
+
+
+        private void cmdWorkWithHHibRepo_Click(object sender, EventArgs e)
+        {
+            using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("LightUOW"))
+            {
+                work.RepositoryType = EnumRepositoryType.NHibernate;
+                Dosomething(EnumRepositoryType.NHibernate, true, work, chkShowMessages.Checked);
+            }
+            GetCountsAndFillDataGrids();
+        }
+
+
+        private void cmdNHibLight_Click(object sender, EventArgs e)
+        {
+            // Direct call, without using
+            IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("LightUOW");
+            Dosomething(EnumRepositoryType.NHibernate, true, work, chkShowMessages.Checked);
+            
+            // Should end call with disposing, otherwise transction hangs up...
+            work.Dispose();
+            GetCountsAndFillDataGrids();
+        }
+
+
+        private void cmdUseGenericRepo_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (IUnitOfWorkGeneric genericWork = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWorkGeneric>("GenericUOW"))
+                {
+                    //genericWork.BeginTransaction();
+
+                    genericWork.LogRepository.Create(new Log { Description = "Test", Created = DateTime.Now });
+
+                    DosomethingWithOrders(EnumRepositoryType.NHibernate, chkRaiseError.Checked, genericWork, false);
+
+                    if (chkRaiseError.Checked)
+                        throw new Exception("Error, abort transaction...");
+
+                    genericWork.Commit();
+                }
+                GetCountsAndFillDataGrids();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+
+            }
+        }
+
+
+        private void cmdMessage_Click(object sender, EventArgs e)
         {
             try
             {
@@ -35,150 +102,146 @@ namespace UnitOfWorkDemo
             {
                 MessageBox.Show(ex.ToString());
             }
-
         }
+        #endregion
 
-
-        private void cmdWorkWithRepository_Click(object sender, EventArgs e)
-        {
-            Dosomething(EnumRepositoryType.InMemory, false);
-            dgPearsons.DataSource = GetAll(EnumRepositoryType.InMemory, false);
-        }
-
-
-        private void cmdWorkWithHHibRepo_Click(object sender, EventArgs e)
-        {
-            Dosomething(EnumRepositoryType.NHibernate, false);
-            dgPearsons.DataSource = GetAll(EnumRepositoryType.NHibernate, false);
-        }
-
-
-        private void cmdHelloHib_Click(object sender, EventArgs e)
-        {
-            IList<Pearson> pearsonList = null;
-
-            IPearsonRepository pearsonRepo = StructureMap.ObjectFactory.GetNamedInstance<IPearsonRepository>("NHibRepo");
-
-            pearsonList = pearsonRepo.Get().ToList();
-
-            dgPearsons.DataSource = pearsonList;
-
-            lblStatistics.Text = "Total records returned: " + pearsonList.Count;
-
-            return;
-
-            INHibernateSessionFactory sessionFactory = StructureMap.ObjectFactory.GetInstance<INHibernateSessionFactory>();
-
-            using (var session = sessionFactory.CreateSessionFactory().OpenSession())
-            {
-                string h_stmt = "FROM Pearson";
-
-                IQuery query = session.CreateQuery(h_stmt);
-
-                pearsonList = query.List<Pearson>();
-
-                dgPearsons.DataSource = pearsonList;
-
-                lblStatistics.Text = "Total records returned: " + pearsonList.Count;
-
-            }
-
-        }
 
 
         #region Methods
+        private void GetCountsAndFillDataGrids()
+        {
+            try
+            {
+                IList<Pearson> pearsonList = null;
+                IList<Order> ordersList = null;
+                IList<Log> logList = null;
 
-        private void Dosomething(EnumRepositoryType repoType, bool light)
+                using (IUnitOfWorkGeneric genericWork = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWorkGeneric>("GenericUOW"))
+                {
+                    ordersList = genericWork.OrderRepository.GetAll().ToList();
+                    pearsonList = genericWork.PearsonRepository.GetAll().ToList();
+                    logList = genericWork.LogRepository.GetAll().ToList();
+                }
+
+                dgPearsons.DataSource = pearsonList;
+                dgOrders.DataSource = ordersList;
+                dgLogs.DataSource = logList;
+
+                lblLogCount.Text = logList.Count.ToString();
+                lblPearsonCounts.Text = pearsonList.Count.ToString();
+                lblOrdersCount.Text = ordersList.Count.ToString();
+
+                lblTime.Text = "At: " + DateTime.Now.ToShortTimeString();
+                lblStatistics.Text = "Total pearsons returned: " + pearsonList.Count.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+
+            }
+        }
+
+        private void Dosomething(EnumRepositoryType repoType, bool useSingleTransaction, IUnitOfWork work, bool showMessages)
         {
             int deleteIndex = 0;
             int editIndex = 0;
             int count = 0;
             try
             {
-                if (light)
-                {
-                    // This is UOW example with embedet NHibernate transaction
-                    using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("LightUOW"))
-                    {
-                        string data;
+                string data;
 
-                        // Get current count
-                        count = work.PearsonRepository.Get().Count();
+                // Get current count
+                count = work.PearsonRepository.Get().Count();
 
-                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
-                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
-                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
-                        //work.Save();
-                        deleteIndex = GetDeleteIndex(count);
-                        editIndex = GetEditIndex(count);
+                lblStatistics.Text = "Total pearsons returned: " + count.ToString();
 
-                        data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
-                        //MessageBox.Show("Before edit: \n" + data);
+                work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
+                work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
 
-                        Pearson updatePearson = work.PearsonRepository.Get().ToArray()[editIndex];
+                if (!useSingleTransaction)
+                    work.Save();
 
-                        updatePearson.FirstName = "Katarina";
-                        updatePearson.LastName = "Ročnik";
+                deleteIndex = GetDeleteIndex(count);
+                editIndex = GetEditIndex(count);
 
+                data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
 
-                        work.PearsonRepository.Update(updatePearson);
+                if (showMessages)
+                    MessageBox.Show("Before edit: \n" + data);
 
-                        Pearson deletePearson = work.PearsonRepository.Get().ToArray()[deleteIndex];
+                Pearson updatePearson = work.PearsonRepository.Get().ToArray()[editIndex];
 
-                        work.PearsonRepository.Delete(deletePearson.Id);
-                        //work.Save();
-
-                        data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
-                        //MessageBox.Show("After edit: \n" + data);
+                updatePearson.FirstName = "Katarina";
+                updatePearson.LastName = "Ročnik";
 
 
-                        //MessageBox.Show("Final result: \n" + data + "\n Število vseh: " + work.PearsonRepository.Get().Count().ToString());
+                work.PearsonRepository.Update(updatePearson);
 
-                        if(chkRaiseError.Checked)
-                            throw new Exception("Error, nothing should be saved");
+                Pearson deletePearson = work.PearsonRepository.Get().ToArray()[deleteIndex];
 
-                        work.Save();
-                    }
-                }
-                else
-                {
-                    using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("BasicUOWNHib"))
-                    {
-                        work.RepositoryType = EnumRepositoryType.NHibernate;
-                        string data;
+                work.PearsonRepository.Delete(deletePearson.Id);
 
-                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
-                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
-                        work.PearsonRepository.Create(new Entities.Pearson { FirstName = "Peter", LastName = "Topolšek" });
-                        work.Save();
+                if (!useSingleTransaction)
+                    work.Save();
 
-                        data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
-                        MessageBox.Show("Before edit: \n" + data);
+                data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
+                if (showMessages)
+                    MessageBox.Show("After edit: \n" + data);
 
-                        Pearson editPearson = work.PearsonRepository.GetByIndex(1);
-                        
-                        work.PearsonRepository.Update(new Entities.Pearson { Id = 2, FirstName = "Katarina", LastName = "Ročnik" });
-                        work.PearsonRepository.Delete(3);
-                        work.Save();
+                if (showMessages)
+                    MessageBox.Show("Final result: \n" + data + "\n Število vseh: " + work.PearsonRepository.Get().Count().ToString());
 
-                        data = string.Join(",", work.PearsonRepository.Get().Select(p => p.FirstName).ToArray());
-                        MessageBox.Show("After edit: \n" + data);
+                if (chkRaiseError.Checked)
+                    throw new Exception("Error, nothing should be saved or everything, depends of UnitOfWork/Repository combination you pick...");
+
+                work.Save();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: \n" + ex.Message,"Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
+        }
+
+        private void DosomethingWithOrders(EnumRepositoryType repoType, bool useSingleTransaction, IUnitOfWorkGeneric work, bool showMessages)
+        {
+            int editIndex = 0;
+            int count = 0;
+            try
+            {
+                // Get current count
+                count = work.PearsonRepository.GetAll().Count();
+
+                lblStatistics.Text = "Total pearsons returned: " + count.ToString();
 
 
-                        MessageBox.Show("Final result: \n" + data + "\n Število vseh: " + work.PearsonRepository.Get().Count().ToString());
+                // Add new pearson and orders
+                Pearson newPearson = new Entities.Pearson { FirstName = "Marko", LastName = "Novak" };
 
-                        if (chkRaiseError.Checked)
-                            throw new Exception("Error, the object was saved, because every method is wraped in transaction");
+                newPearson = work.PearsonRepository.Create(newPearson);
 
-                        work.Save();
-                    }
-                }
+                newPearson = work.PearsonRepository.GetById(newPearson.Id);
+
+                newPearson.Orders.Add(new Order { Pearson = newPearson, Price = 45, Subject = "Some demo text..." });
+
+                newPearson.Orders.Add(new Order { Pearson = newPearson, Price = 53, Subject = "More demo text..." });
+
+                // Add Orders on created pearson
+                editIndex = GetEditIndex(count);
+
+                lblStatistics.Text = lblStatistics.Text + ", Edit index: " + editIndex.ToString();
+
+                Pearson updatePearson = work.PearsonRepository.GetAll().ToArray()[editIndex];
+
+                updatePearson.Orders.Add(new Order { Pearson = updatePearson, Price = 45, Subject = "Some demo text..." });
+
+                updatePearson.Orders.Add(new Order { Pearson = updatePearson, Price = 53, Subject = "More demo text..." });
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error: \n" + ex.Message);
             }
-           
         }
 
         private int GetEditIndex(int count)
@@ -196,36 +259,6 @@ namespace UnitOfWorkDemo
             else
                 return count;
         }
-
-        private IEnumerable<Pearson> GetAll(EnumRepositoryType repoType, bool light)
-        {
-            IList<Pearson> pearsonList = null;
-            if (light)
-            {
-                using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("LightUOW"))
-                {
-                    work.RepositoryType = EnumRepositoryType.NHibernate;
-                    pearsonList = work.PearsonRepository.Get().ToList();
-                }
-            }
-            else
-            {
-                using (IUnitOfWork work = StructureMap.ObjectFactory.GetNamedInstance<IUnitOfWork>("BasicUOWNHib"))
-                {
-                    work.RepositoryType = EnumRepositoryType.NHibernate;
-                    pearsonList = work.PearsonRepository.Get().ToList();
-                }
-            }
-
-            return pearsonList;
-            
-        }
         #endregion
-
-        private void cmdNHibLight_Click(object sender, EventArgs e)
-        {
-            Dosomething(EnumRepositoryType.NHibernate, true);
-            dgPearsons.DataSource = GetAll(EnumRepositoryType.NHibernate, true);
-        }
     }
 }

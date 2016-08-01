@@ -33,6 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="C1.Win.C1FlexGrid.4, Version=4.0.20153.102, Culture=neutral, PublicKeyToken=79882d576c6336da" />
+    <Reference Include="C1.Win.C1FlexGrid.Classic.4, Version=4.0.20153.102, Culture=neutral, PublicKeyToken=79882d576c6336da, processorArchitecture=MSIL" />
     <Reference Include="FluentNHibernate, Version=2.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentNHibernate.2.0.3.0\lib\net40\FluentNHibernate.dll</HintPath>
       <Private>True</Private>
@@ -66,13 +68,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Abstract\INHibernateSessionFactory.cs" />
+    <Compile Include="Data\Abstract\IOrderRepository.cs" />
     <Compile Include="Data\Abstract\IPearsonRepository.cs" />
+    <Compile Include="Data\Abstract\IRepository.cs" />
+    <Compile Include="Data\GenericSessionFactory.cs" />
+    <Compile Include="Data\RepositoryGeneric.cs" />
     <Compile Include="Data\InMemoryDataRepository.cs" />
     <Compile Include="Data\NHibernateLightDataRepository.cs" />
     <Compile Include="Data\NHibernateDataRepository.cs" />
     <Compile Include="Data\NHibernateFactory.cs" />
     <Compile Include="Data\NHibernateStaticFactory.cs" />
-    <Compile Include="Helpers\Entities\Pearson.cs" />
+    <Compile Include="Entities\DTOOrder.cs" />
+    <Compile Include="Entities\Log.cs" />
+    <Compile Include="Entities\Order.cs" />
+    <Compile Include="Entities\Pearson.cs" />
     <Compile Include="EnumRepositoryType.cs" />
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
@@ -82,17 +91,22 @@
     </Compile>
     <Compile Include="IoCWrapper.cs" />
     <Compile Include="IUnitOfWork.cs" />
+    <Compile Include="IUnitOfWorkGeneric.cs" />
+    <Compile Include="Mappings\OrderMap.cs" />
+    <Compile Include="Mappings\LogMap.cs" />
     <Compile Include="Mappings\PearsonMap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IMessageService.cs" />
     <Compile Include="Services\MessageServiceA.cs" />
     <Compile Include="Services\MessageServiceB.cs" />
+    <Compile Include="UnitOfWorkGeneric.cs" />
     <Compile Include="UnitOfWorkNHibernate.cs" />
     <Compile Include="UnitOfWork.cs" />
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -102,7 +116,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="CodeMap1.dgml" />
+    <None Include="Graph1.dgml" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\UnitOfWorkDemo.Entities.Pearson.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -36,6 +36,7 @@ namespace UnitOfWorkDemo
                     .Ctor<EnumRepositoryType>()
                         .Is(ctx => EnumRepositoryType.NHibernate);
 
+
                 x.For<IPearsonRepository>()
                     .Use<NHibernateLighDataRepository>().Named("NHibRepoLight")
                     .Ctor<ISession>()
@@ -45,10 +46,8 @@ namespace UnitOfWorkDemo
                 x.For<IUnitOfWork>()
                 .Use<UnitOfWork>().Named("BasicUOWNHib");
 
-
-                x.For<IUnitOfWork>()
-                .Use<UnitOfWork>().Named("BasicUOWInMemory");
-
+                x.For<IUnitOfWorkGeneric>()
+                .Use<UnitOfWorkGeneric>().Named("GenericUOW");
 
                 x.For<IUnitOfWork>()
                 .Use<UnitOfWorkNhibernate>().Named("LightUOW")

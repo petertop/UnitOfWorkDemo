@@ -11,7 +11,6 @@ namespace UnitOfWorkDemo
     {
         void Save();
         IPearsonRepository PearsonRepository { get; }
-
         EnumRepositoryType RepositoryType { get; set; }
     }
 }
